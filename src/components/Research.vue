@@ -19,6 +19,7 @@
           Search
         </button>
       </div>
+      <FieldInfoList :fieldInfoList="filteredGrammar" v-if="grammar" />
     </div>
   </div>
 </template>
@@ -26,20 +27,31 @@
 <script setup lang="ts">
   import { ref, onMounted, defineEmits } from 'vue'
   import axios from 'axios'
-  import { GrammarResponse } from '../types/gammarTypes'
+  import FieldInfoList from './FieldInfoList.vue'
+  import { FieldInfo } from '../types/gammarTypes'
+  import { transformToFieldInfo } from '../helpers/transformToFieldInfo'
 
   const searchQuery = ref<string>('')
-  const grammar = ref<GrammarResponse | null>()
+  const grammar = ref<FieldInfo[]>()
+  const filteredGrammar = ref<FieldInfo[]>()
 
   const search = () => {
-    emit('search', searchQuery.value)
+    const query = searchQuery.value.toLowerCase().trim()
+    if (query === '') {
+      filteredGrammar.value = grammar.value
+    } else {
+      filteredGrammar.value = (grammar.value || []).filter((fieldInfo) =>
+        fieldInfo.field.toLowerCase().includes(query)
+      )
+    }
   }
 
   const fetchGrammar = async () => {
     try {
       const response = await axios.get('http://localhost:8000/api/claims')
       const data = response.data
-      grammar.value = data
+      grammar.value = transformToFieldInfo(data.data.scopes)
+      filteredGrammar.value = grammar.value // Initialize filteredGrammar with all fields
     } catch (error) {
       console.error('Erreur:', error)
     }
@@ -48,7 +60,6 @@
   onMounted(() => {
     fetchGrammar()
   })
-  console.log(grammar.value)
 
   const emit = defineEmits(['search'])
 </script>

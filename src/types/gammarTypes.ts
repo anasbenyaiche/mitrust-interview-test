@@ -2,7 +2,12 @@ export interface GrammarResponse {
   status: string
   data: GrammarData
 }
-
+export interface FieldInfo {
+  field: string
+  desc_2?: string
+  examples?: string
+  children?: FieldInfo[]
+}
 export interface GrammarData {
   scopes: Scopes
   deprecated: Deprecated
