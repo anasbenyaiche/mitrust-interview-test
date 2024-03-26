@@ -51,7 +51,7 @@
       const response = await axios.get('http://localhost:8000/api/claims')
       const data = response.data
       grammar.value = transformToFieldInfo(data.data.scopes)
-      filteredGrammar.value = grammar.value // Initialize filteredGrammar with all fields
+      filteredGrammar.value = grammar.value
     } catch (error) {
       console.error('Erreur:', error)
     }
